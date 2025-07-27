@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Throttle/Debounce Higher-Order Function</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #282c34; /* Dark background */
+            color: #abb2bf; /* Light text */
+        }
+
+        h1 {
+            color: #61afef; /* Light blue heading */
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #323842;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .controls label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+        }
+
+        .controls input[type="radio"],
+        .controls input[type="checkbox"] {
+            accent-color: #61afef;
+        }
+
+        .controls input[type="number"] {
+            width: 70px;
+            padding: 5px 8px;
+            border: 1px solid #4a515c;
+            background-color: #21252b;
+            color: #abb2bf;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            background-color: #61afef;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #528bff;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #event-area {
+            width: 80%;
+            height: 150px;
+            background-color: #0d1117;
+            border: 2px dashed #4a515c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            color: #98c379;
+            margin-top: 20px;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+        }
+
+        #output-log {
+            width: 80%;
+            height: 250px;
+            background-color: #1a1e24;
+            border: 1px solid #4a515c;
+            margin-top: 20px;
+            padding: 15px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85em;
+            color: #c9d1d9;
+            border-radius: 8px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+        .log-entry.triggered {
+            color: #61afef; /* Blue for triggered events */
+            font-weight: bold;
+        }
+        .log-entry.ignored {
+            color: #7b8493; /* Grey for ignored events */
+        }
+    </style>
+</head>
+<body>
+    <h1>Throttle/Debounce Function Demonstrator</h1>
+
+    <div class="controls">
+        <label>
+            <input type="radio" name="type" value="debounce" checked> Debounce
+        </label>
+        <label>
+            <input type="radio" name="type" value="throttle"> Throttle
+        </label>
+        <label>
+            Wait (ms):
+            <input type="number" id="wait-time" value="300" min="50" step="50">
+        </label>
+        <label>
+            <input type="checkbox" id="leading-edge" checked> Leading Edge
+        </label>
+        <label>
+            <input type="checkbox" id="trailing-edge" checked> Trailing Edge
+        </label>
+        <button onclick="applySettings()">Apply Settings and Reset</button>
+    </div>
+
+    <div id="event-area">Click or hover rapidly here!</div>
+
+    <div id="output-log">
+        <div class="log-entry">--- Event Log ---</div>
+    </div>
+
+    <script>
+        /**
+         * A higher-order function that returns a debounced or throttled version of the given function.
+         *
+         * @param {Function} func The function to debounce or throttle.
+         * @param {number} wait The number of milliseconds to wait.
+         * @param {object} [options={}] Options object.
+         * @param {'debounce'|'throttle'} [options.type='debounce'] The type of control: 'debounce' or 'throttle'.
+         * @param {boolean} [options.leading] If true, func is invoked on the leading edge of the timeout.
+         * Defaults to true for 'throttle', false for 'debounce'.
+         * @param {boolean} [options.trailing=true] If true, func is invoked on the trailing edge of the timeout.
+         * @returns {Function} Returns the new debounced or throttled function.
+         */
+        function throttleDebounce(func, wait, options = {}) {
+            const { type = 'debounce', leading = type === 'throttle', trailing = true } = options;
+
+            if (type === 'debounce') {
+                return debounce(func, wait, { leading, trailing });
+            } else if (type === 'throttle') {
+                return throttle(func, wait, { leading, trailing });
+            } else {
+                console.error("Invalid type for throttleDebounce. Must be 'throttle' or 'debounce'. Defaulting to debounce.");
+                return debounce(func, wait, { leading, trailing });
+            }
+        }
+
+        /**
+         * Debounce HOF: Ensures the function is called only after a specified time
+         * has passed since the last invocation. Each new invocation resets the timer.
+         *
+         * @param {Function} func The function to debounce.
+         * @param {number} wait The number of milliseconds to wait.
+         * @param {object} [options={}] Options object.
+         * @param {boolean} [options.leading=false] If true, func is invoked on the leading edge of the timeout.
+         * @param {boolean} [options.trailing=true] If true, func is invoked on the trailing edge of the timeout.
+         * @returns {Function} Returns the new debounced function.
+         */
+        function debounce(func, wait, options = {}) {
+            let timeoutId;
+            let lastArgs;
+            let lastThis;
+            let lastResult;
+            const { leading = false, trailing = true } = options;
+
+            return function(...args) {
+                lastArgs = args;
+                lastThis = this;
+
+                // Determine if this call should execute immediately (leading edge)
+                // This is true if leading is enabled AND there's no active timer
+                const isInvokedImmediately = leading && !timeoutId;
+
+                // Clear any existing timer to reset the debounce countdown
+                clearTimeout(timeoutId);
+
+                // Set a new timer for the trailing call
+                timeoutId = setTimeout(() => {
+                    timeoutId = null; // Timer has completed
+
+                    // If trailing is enabled AND (leading was false OR (leading was true AND it wasn't the immediate call))
+                    // This ensures the trailing call happens unless leading was true and it was the *only* call
+                    if (trailing && (!leading || !isInvokedImmediately)) {
+                        lastResult = func.apply(lastThis, lastArgs);
+                    }
+                }, wait);
+
+                // Execute immediately if leading edge is enabled and it's the first call in the sequence
+                if (isInvokedImmediately) {
+                    lastResult = func.apply(lastThis, lastArgs);
+                }
+                return lastResult;
+            };
+        }
+
+        /**
+         * Throttle HOF: Ensures the function is called at most once within a specified time window.
+         *
+         * @param {Function} func The function to throttle.
+         * @param {number} wait The number of milliseconds to wait.
+         * @param {object} [options={}] Options object.
+         * @param {boolean} [options.leading=true] If true, func is invoked on the leading edge of the timeout.
+         * @param {boolean} [options.trailing=true] If true, func is invoked on the trailing edge of the timeout.
+         * @returns {Function} Returns the new throttled function.
+         */
+        function throttle(func, wait, options = {}) {
+            let timeoutId;
+            let lastArgs;
+            let lastThis;
+            let lastResult;
+            let lastExecTime = 0; // Timestamp of the last actual function execution
+            const { leading = true, trailing = true } = options;
+
+            return function(...args) {
+                const now = Date.now();
+                lastArgs = args;
+                lastThis = this;
+
+                // Calculate time remaining until the next allowed execution
+                const remaining = wait - (now - lastExecTime);
+
+                // Case 1: Execute immediately (leading edge or enough time has passed)
+                // `remaining > wait` handles the initial call where lastExecTime is 0
+                if (remaining <= 0 || remaining > wait) {
+                    if (timeoutId) { // Clear any pending trailing call from a previous burst
+                        clearTimeout(timeoutId);
+                        timeoutId = null;
+                    }
+                    lastExecTime = now; // Update the last execution time
+                    lastResult = func.apply(lastThis, lastArgs);
+                }
+                // Case 2: Schedule a trailing call
+                else if (!timeoutId && trailing) { // If no trailing call is currently scheduled AND trailing is enabled
+                    timeoutId = setTimeout(() => {
+                        // When the trailing call fires, update lastExecTime to now
+                        // This is important for the next leading call to be correctly timed
+                        lastExecTime = Date.now();
+                        timeoutId = null; // Clear the timeout ID
+                        lastResult = func.apply(lastThis, lastArgs);
+                    }, remaining); // Schedule for the remaining time
+                }
+                return lastResult;
+            };
+        }
+
+        // --- Demonstration Logic ---
+        const eventArea = document.getElementById('event-area');
+        const outputLog = document.getElementById('output-log');
+        const typeRadios = document.querySelectorAll('input[name="type"]');
+        const waitTimeInput = document.getElementById('wait-time');
+        const leadingEdgeCheckbox = document.getElementById('leading-edge');
+        const trailingEdgeCheckbox = document.getElementById('trailing-edge');
+
+        let eventCount = 0;
+        let controlledFunction;
+
+        function logEvent(type, message) {
+            const entry = document.createElement('div');
+            entry.classList.add('log-entry');
+            entry.textContent = `${new Date().toLocaleTimeString()}.${String(new Date().getMilliseconds()).padStart(3, '0')} - ${message}`;
+            if (type === 'triggered') {
+                entry.classList.add('triggered');
+            } else if (type === 'ignored') {
+                entry.classList.add('ignored');
+            }
+            outputLog.prepend(entry); // Add to top
+        }
+
+        function myEventLogger() {
+            logEvent('triggered', `Function executed! (Event count: ${eventCount})`);
+        }
+
+        function updateControlledFunction() {
+            const selectedType = document.querySelector('input[name="type"]:checked').value;
+            const waitTime = parseInt(waitTimeInput.value, 10);
+            const leading = leadingEdgeCheckbox.checked;
+            const trailing = trailingEdgeCheckbox.checked;
+
+            // Reset event count and log
+            eventCount = 0;
+            outputLog.innerHTML = '<div class="log-entry">--- Event Log ---</div>';
+            logEvent('info', `Configured: Type=${selectedType}, Wait=${waitTime}ms, Leading=${leading}, Trailing=${trailing}`);
+
+            controlledFunction = throttleDebounce(myEventLogger, waitTime, {
+                type: selectedType,
+                leading: leading,
+                trailing: trailing
+            });
+        }
+
+        function handleEvent() {
+            eventCount++;
+            logEvent('ignored', `Event fired. (Total: ${eventCount})`);
+            controlledFunction(); // Call the throttled/debounced function
+        }
+
+        // Initial setup
+        updateControlledFunction();
+
+        // Attach event listeners
+        eventArea.addEventListener('mousemove', handleEvent); // For rapid events
+        eventArea.addEventListener('click', handleEvent);     // Also for clicks
+
+        typeRadios.forEach(radio => radio.addEventListener('change', updateControlledFunction));
+        waitTimeInput.addEventListener('change', updateControlledFunction);
+        leadingEdgeCheckbox.addEventListener('change', updateControlledFunction);
+        trailingEdgeCheckbox.addEventListener('change', updateControlledFunction);
+
+        function applySettings() {
+            updateControlledFunction();
+        }
+    </script>
+</body>
+</html>
