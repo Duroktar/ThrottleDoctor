@@ -1,5 +1,9 @@
 # Throttle Doctor: The Workbench
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Duroktar/ThrottleDoctor/refs/heads/main/public/logo.svg" width="800px" />
+</p>
+
 ## 🩺 Fine-Tune Your Event Handling!
 
 Welcome to the `Throttle Doctor` Workbench! This interactive demonstration site is your personal sandbox for understanding and experimenting with the core concepts of throttling and debouncing in JavaScript.
