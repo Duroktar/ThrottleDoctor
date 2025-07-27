@@ -33,13 +33,6 @@
     <tspan x="180" dy="0">THROTTLE</tspan>
     <tspan x="172" dy="30">DOCTOR</tspan> <!-- Adjusted x for "DOCTOR" by -8 pixels -->
   </text>
-  <!-- Fallback font for 'Press Start 2P' -->
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-    text {
-      font-family: 'Press Start 2P', cursive, monospace;
-    }
-  </style>
 
   <!-- Chaotic Input Pulse (Left Side) - SHIFTED LEFT BY 8 PIXELS -->
   <path d="M48 110 L68 100 L88 120 L108 105 L128 115 L148 100"
