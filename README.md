@@ -28,9 +28,7 @@ Are you tired of guessing how `leading` vs. `trailing` edge executions behave? D
 
 Simply open `index.html` in your web browser. Use the controls at the top to configure your desired throttling or debouncing behavior, then interact with the designated "Event Area" to see the results reflected in the "Output Log."
 
-### Use online
-
-### Online (recommended)
+### Use Online (recommended)
  
 [Start here](https://duroktar.github.io/ThrottleDoctor/)
 
