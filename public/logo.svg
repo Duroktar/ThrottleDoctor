@@ -1,12 +1,12 @@
-<svg width="350" height="200" viewBox="0 0 350 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="350" height="180" viewBox="0 0 350 180" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Background: Dark Cyberpunk Grid -->
-  <rect x="0" y="0" width="350" height="200" rx="15" fill="#1a1a2e"/>
+  <rect x="0" y="0" width="350" height="180" rx="15" fill="#1a1a2e"/>
   <defs>
     <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
       <path d="M 10 0 L 0 0 L 0 10" fill="none" stroke="#2a2a4a" stroke-width="0.5"/>
     </pattern>
   </defs>
-  <rect x="0" y="0" width="350" height="200" fill="url(#grid)" opacity="0.5"/>
+  <rect x="0" y="0" width="350" height="180" fill="url(#grid)" opacity="0.5"/>
 
   <!-- Neon Glow Filter -->
   <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -28,30 +28,30 @@
     </feMerge>
   </filter>
 
-  <!-- Text "Throttle Doctor" - REMAINS AT TOP, already centered -->
-  <text x="180" y="35" font-family="'Press Start 2P', cursive, monospace" font-size="28" font-weight="bold" fill="#98c379" text-anchor="middle">
-    <tspan x="180" dy="0">THROTTLE</tspan>
-    <tspan x="172" dy="30">DOCTOR</tspan> <!-- Adjusted x for "DOCTOR" by -8 pixels -->
+  <!-- Text "Throttle Doctor" - ADJUSTED Y POSITION -->
+  <text x="180" y="40" font-family="'Press Start 2P', cursive, monospace" font-size="28" font-weight="bold" fill="#98c379" text-anchor="middle">
+    <tspan x="179" dy="0">THROTTLE</tspan>
+    <tspan x="165" dy="30">DOCTOR</tspan>
   </text>
 
   <!-- Chaotic Input Pulse (Left Side) - SHIFTED LEFT BY 8 PIXELS -->
-  <path d="M48 110 L68 100 L88 120 L108 105 L128 115 L148 100"
+  <path d="M48 115 L68 105 L88 125 L108 110 L128 120 L148 105"
         stroke="#ff00ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
         filter="url(#neonGlowPink)"/>
-  <text x="88" y="90" font-family="Consolas, monospace" font-size="12" fill="#ff00ff" text-anchor="middle" font-weight="bold">CHAOS</text>
+  <text x="88" y="95" font-family="Consolas, monospace" font-size="12" fill="#ff00ff" text-anchor="middle" font-weight="bold">CHAOS</text>
 
-  <!-- Smooth Output Pulse (Right Side) - SHIFTED LEFT BY 8 PIXELS -->
-  <path d="M188 110 C198 100, 208 120, 218 110 S238 100, 248 110 S268 100, 278 110"
+  <!-- Smooth Output Pulse (Right Side) - ADJUSTED Y POSITION & LENGTH -->
+  <path d="M188 115 C198 105, 208 125, 218 115 S238 105, 248 115 S268 105, 296 115"
         stroke="#00ffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
         filter="url(#neonGlow)"/>
-  <text x="245" y="90" font-family="Consolas, monospace" font-size="12" fill="#00ffff" text-anchor="middle" font-weight="bold">CONTROL</text>
+  <text x="252" y="95" font-family="Consolas, monospace" font-size="12" fill="#00ffff" text-anchor="middle" font-weight="bold">CONTROL</text>
 
 
-  <!-- Transition/Control Module (where chaos meets control) - SHIFTED LEFT BY 3 PIXELS -->
-  <rect x="145" y="95" width="40" height="30" rx="5" fill="#333366" stroke="#61afef" stroke-width="2"/>
-  <circle cx="165" cy="110" r="8" fill="#e06c75" stroke="#ff00ff" stroke-width="2"/>
-  <path d="M160 110 L170 110" stroke="white" stroke-width="2" stroke-linecap="round"/>
-  <path d="M165 105 L165 115" stroke="white" stroke-width="2" stroke-linecap="round"/>
-  <text x="166" y="140" font-family="Consolas, monospace" font-size="10" fill="#61afef" text-anchor="middle" font-weight="bold">ADJUST</text>
+  <!-- Transition/Control Module (where chaos meets control) - SHIFTED RIGHT BY 3 PIXELS -->
+  <rect x="148" y="100" width="40" height="30" rx="5" fill="#333366" stroke="#61afef" stroke-width="2"/>
+  <circle cx="168" cy="115" r="8" fill="#e06c75" stroke="#ff00ff" stroke-width="2"/>
+  <path d="M163 115 L173 115" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M168 110 L168 120" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <text x="169" y="145" font-family="Consolas, monospace" font-size="10" fill="#61afef" text-anchor="middle" font-weight="bold">ADJUST</text>
 
 </svg>
