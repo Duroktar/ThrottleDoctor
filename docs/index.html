@@ -3,60 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Throttle Doctor: The Workbench</title>
+    <title>Throttle Doctor</title>
     <style>
+        /* Import fonts for both themes */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Arial&display=swap'); /* Fallback/Original theme font */
 
+        /* --- Base / Original Theme Styles (Default) --- */
         body {
-            font-family: 'Orbitron', sans-serif; /* Futuristic heading font */
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            background-color: #0a0a1a; /* Very dark, almost black background */
-            color: #00ffff; /* Default neon cyan text */
-            overflow-x: hidden; /* Prevent horizontal scroll on subtle effects */
-            position: relative; /* For background effects */
+            background-color: #282c34; /* Dark background */
+            color: #abb2bf; /* Light text */
+            overflow-x: hidden;
+            position: relative;
+            gap: 25px; /* Unified vertical spacing between direct children */
         }
 
-        /* Subtle background grid/scanlines effect */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image:
-                linear-gradient(to right, #00ffff11 1px, transparent 1px),
-                linear-gradient(to bottom, #00ffff11 1px, transparent 1px);
-            background-size: 20px 20px;
-            opacity: 0.1;
-            z-index: -1;
+        body::before { /* Remove grid for original theme */
+            content: none;
         }
 
         h1 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: Arial, sans-serif;
             font-weight: 700;
             font-size: 2.5em;
-            color: #ff00ff; /* Neon magenta heading */
-            text-shadow: 0 0 8px #ff00ff, 0 0 15px #ff00ff; /* Neon glow */
-            margin-bottom: 30px;
-            letter-spacing: 2px;
+            color: #61afef; /* Light blue heading */
+            text-shadow: none;
+            margin-bottom: 0; /* Managed by body gap */
             padding-top: 20px;
         }
 
-        .controls, .support-blurb, #output-log {
-            background-color: #1a1a2e; /* Darker panel background */
-            border: 1px solid #00ffff; /* Neon cyan border */
-            box-shadow: 0 0 10px #00ffff44, inset 0 0 5px #00ffff22; /* Subtle inner/outer glow */
-            border-radius: 10px;
+        .controls, .support-blurb, #event-area, #log-section {
+            background-color: #323842; /* Darker panel background */
+            border: 1px solid #4a515c; /* Grey border */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
             padding: 20px;
-            margin-bottom: 25px;
-            width: 85%; /* Wider panels */
-            max-width: 900px; /* Max width for larger screens */
+            margin-bottom: 0; /* Managed by body gap */
+            width: 85%;
+            max-width: 900px;
             box-sizing: border-box;
             display: flex;
             flex-wrap: wrap;
@@ -64,28 +55,17 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            overflow: hidden; /* For internal glow effects */
+            overflow: hidden;
         }
 
-        .controls::before, .support-blurb::before, #output-log::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 10px;
-            box-shadow: 0 0 20px #ff00ff44, inset 0 0 10px #ff00ff22; /* Magenta inner glow */
-            opacity: 0.1;
-            pointer-events: none;
-            z-index: 0;
+        .controls::before, .support-blurb::before, #event-area::before, #log-section::before {
+            content: none; /* Remove inner glow for original theme */
         }
-
 
         .controls label {
-            font-family: 'Share Tech Mono', monospace; /* Monospace for labels */
+            font-family: Arial, sans-serif;
             font-size: 1em;
-            color: #00e5ff; /* Lighter neon cyan */
+            color: #abb2bf;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -93,152 +73,417 @@
 
         .controls input[type="radio"],
         .controls input[type="checkbox"] {
-            accent-color: #ff00ff; /* Neon magenta for checked state */
-            transform: scale(1.2); /* Slightly larger checkboxes/radios */
+            accent-color: #61afef;
+            transform: scale(1);
         }
 
         .controls input[type="number"] {
             width: 80px;
             padding: 8px 12px;
-            border: 1px solid #00ffff;
-            background-color: #0d0d1a; /* Even darker input background */
-            color: #66ff66; /* Neon green for input values */
+            border: 1px solid #4a515c;
+            background-color: #21252b;
+            color: #abb2bf;
             border-radius: 6px;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: Consolas, monospace;
             font-size: 1em;
-            box-shadow: inset 0 0 5px #00ffff33;
+            box-shadow: none;
         }
 
         button {
-            font-family: 'Orbitron', sans-serif;
+            font-family: Arial, sans-serif;
             padding: 14px 30px;
             font-size: 1.1em;
-            background: linear-gradient(45deg, #00ffff, #ff00ff); /* Gradient button */
-            color: #0a0a1a; /* Dark text on bright button */
+            background: #61afef; /* Solid blue button */
+            color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 0 15px #00ffff, 0 0 25px #ff00ff; /* Strong neon glow */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             font-weight: bold;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            letter-spacing: normal;
+            text-transform: none;
         }
 
         button:hover {
-            background: linear-gradient(45deg, #ff00ff, #00ffff); /* Reverse gradient on hover */
-            box-shadow: 0 0 20px #ff00ff, 0 0 35px #00ffff;
+            background: #528bff;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
             transform: translateY(-2px) scale(1.02);
         }
 
         button:active {
             transform: translateY(1px) scale(0.98);
-            box-shadow: 0 0 5px #00ffff, 0 0 10px #ff00ff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         #event-area {
-            width: 85%;
-            max-width: 900px;
-            height: 180px; /* Slightly taller */
-            background-color: #0d0d1a;
-            border: 2px dashed #ff66cc; /* Neon pink dashed border */
+            height: 180px;
+            background-color: #0d1117;
+            border: 2px dashed #4a515c;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: Consolas, monospace;
             font-size: 1.4em;
-            color: #66ff66; /* Neon green text */
-            margin-top: 25px;
+            color: #98c379;
+            margin-top: 0; /* Managed by body gap */
             cursor: pointer;
             user-select: none;
-            box-shadow: inset 0 0 15px #ff66cc55, 0 0 10px #ff66cc33; /* Inner glow */
-            border-radius: 10px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 5px #66ff66;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            letter-spacing: normal;
+            text-shadow: none;
+        }
+
+        #log-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Space between output-log and log options */
+            padding: 20px; /* Adjust padding as it now contains children */
+            background-color: #323842; /* Match controls background */
+            border: 1px solid #4a515c; /* Match controls border */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Match controls shadow */
+            border-radius: 8px; /* Match controls border-radius */
         }
 
         #output-log {
-            height: 300px; /* Taller log area */
-            font-family: 'Share Tech Mono', monospace;
+            height: 300px;
+            width: inherit; /* Set width to 100% of its parent (#log-section) */
+            font-family: Consolas, monospace;
             font-size: 0.9em;
-            color: #00e5ff; /* Log text color */
-            padding: 20px;
-            margin-top: 25px; /* Added padding between event-area and output-log */
+            color: #c9d1d9;
+            padding: 15px; /* Inner padding for the log entries */
+            margin-top: 0; /* Managed by #log-section gap */
+            overflow: auto; /* Changed to auto for better scroll behavior */
+            background-color: #0d1117; /* Darker background for log area */
+            border: 1px solid #4a515c; /* Border for log area */
+            border-radius: 6px; /* Rounded corners for log area */
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2); /* Inner shadow for log area */
         }
         .log-entry {
             margin-bottom: 8px;
             line-height: 1.5;
-            text-shadow: 0 0 3px #00e5ff22;
+            text-shadow: none;
         }
         .log-entry.triggered {
-            color: #ff66cc; /* Neon pink for triggered events */
+            color: #61afef;
             font-weight: bold;
-            text-shadow: 0 0 5px #ff66cc;
+            text-shadow: none;
         }
         .log-entry.ignored {
-            color: #7b8493; /* Subtler grey for ignored events */
-            opacity: 0.7;
+            color: #7b8493;
+            opacity: 1;
         }
         .log-entry.info {
-            color: #66ff66; /* Neon green for info messages */
+            color: #98c379;
             font-weight: bold;
-            text-shadow: 0 0 5px #66ff66;
+            text-shadow: none;
         }
 
         .support-blurb {
-            margin-top: 40px;
-            font-family: 'Share Tech Mono', monospace;
+            margin-top: 0; /* Managed by body gap */
+            font-family: Arial, sans-serif;
             font-size: 0.95em;
-            color: #00e5ff;
-            text-shadow: 0 0 5px #00e5ff22;
+            color: #abb2bf;
+            text-shadow: none;
+            text-align: left; /* Align text to the left */
+            display: flex; /* Make it a flex container */
+            flex-direction: column; /* Stack children vertically */
+            gap: 10px; /* Space between lines */
         }
 
         .support-blurb a {
-            color: #ff00ff; /* Neon magenta links */
+            color: #61afef;
             text-decoration: none;
             font-weight: bold;
-            text-shadow: 0 0 8px #ff00ff;
+            text-shadow: none;
             transition: text-shadow 0.3s ease;
         }
 
         .support-blurb a:hover {
             text-decoration: underline;
-            text-shadow: 0 0 12px #ff00ff, 0 0 20px #ff00ff;
+            text-shadow: none;
         }
 
         .copyright-line {
-            margin-top: 25px;
+            margin-top: 0; /* Managed by body gap */
             font-size: 0.75em;
             color: #7b8493;
             text-align: center;
             width: 80%;
+            font-family: Arial, sans-serif;
+            opacity: 1;
+        }
+
+        /* Theme Toggle Switch Styles */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0; /* Managed by body gap */
+            font-family: 'Share Tech Mono', monospace;
+            color: #00e5ff;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #ff00ff; /* Neon magenta when checked */
+            box-shadow: 0 0 8px #ff00ff;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #ff00ff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+            background-color: #00ffff; /* Neon cyan dot when checked */
+        }
+
+        /* --- Neon Theme Overrides (Applied when body has .neon-theme class) --- */
+        body.neon-theme {
+            font-family: 'Orbitron', sans-serif;
+            background-color: #0a0a1a;
+            color: #00ffff;
+        }
+        body.neon-theme::before {
+            content: '';
+            background-image:
+                linear-gradient(to right, #00ffff11 1px, transparent 1px),
+                linear-gradient(to bottom, #00ffff11 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+        }
+
+        body.neon-theme h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ff00ff;
+            text-shadow: 0 0 8px #ff00ff, 0 0 15px #ff00ff;
+            letter-spacing: 2px;
+        }
+
+        body.neon-theme .controls,
+        body.neon-theme .support-blurb,
+        body.neon-theme #event-area,
+        body.neon-theme #log-section {
+            background-color: #1a1a2e;
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 10px #00ffff44, inset 0 0 5px #00ffff22;
+        }
+
+        body.neon-theme .controls::before,
+        body.neon-theme .support-blurb::before,
+        body.neon-theme #event-area::before,
+        body.neon-theme #log-section::before {
+            content: '';
+            box-shadow: 0 0 20px #ff00ff44, inset 0 0 10px #ff00ff22;
+            opacity: 0.1;
+        }
+
+        body.neon-theme .controls label {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00e5ff;
+        }
+
+        body.neon-theme .controls input[type="radio"],
+        body.neon-theme .controls input[type="checkbox"] {
+            accent-color: #ff00ff;
+            transform: scale(1.2);
+        }
+
+        body.neon-theme .controls input[type="number"] {
+            background-color: #0d0d1a;
+            color: #66ff66;
+            border: 1px solid #00ffff;
+            box-shadow: inset 0 0 5px #00ffff33;
+        }
+
+        body.neon-theme button {
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            color: #0a0a1a;
+            box-shadow: 0 0 15px #00ffff, 0 0 25px #ff00ff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        body.neon-theme button:hover {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            box-shadow: 0 0 20px #ff00ff, 0 0 35px #00ffff;
+        }
+
+        body.neon-theme #event-area {
+            background-color: #0d0d1a;
+            border: 2px dashed #ff66cc;
+            font-family: 'Share Tech Mono', monospace;
+            color: #66ff66;
+            box-shadow: inset 0 0 15px #ff66cc55, 0 0 10px #ff66cc33;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px #66ff66;
+        }
+
+        body.neon-theme #output-log {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00e5ff;
+            background-color: #0d0d1a; /* Darker background for log area */
+            border: 1px solid #00ffff66; /* Neon border for log area */
+            box-shadow: inset 0 0 5px #00ffff22; /* Inner shadow for log area */
+        }
+        body.neon-theme .log-entry {
+            text-shadow: 0 0 3px #00e5ff22;
+        }
+        body.neon-theme .log-entry.triggered {
+            color: #ff66cc;
+            text-shadow: 0 0 5px #ff66cc;
+        }
+        body.neon-theme .log-entry.ignored {
+            color: #7b8493;
+            opacity: 0.7;
+        }
+        body.neon-theme .log-entry.info {
+            color: #66ff66;
+            text-shadow: 0 0 5px #66ff66;
+        }
+
+        body.neon-theme .support-blurb {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00e5ff;
+            text-shadow: 0 0 5px #00e5ff22;
+        }
+
+        body.neon-theme .support-blurb a {
+            color: #ff00ff;
+            text-shadow: 0 0 8px #ff00ff;
+        }
+
+        body.neon-theme .support-blurb a:hover {
+            text-shadow: 0 0 12px #ff00ff, 0 0 20px #ff00ff;
+        }
+
+        body.neon-theme .copyright-line {
             font-family: 'Share Tech Mono', monospace;
             opacity: 0.6;
         }
+
+        /* New Grouping Styles */
+        .option-group {
+            border: 1px solid #4a515c; /* Default border */
+            border-radius: 6px;
+            padding: 10px 15px;
+            padding-bottom: 15px; /* Increased bottom padding */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            background-color: #21252b; /* Slightly lighter background for groups */
+            margin: 5px 0; /* Small margin around groups */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); /* Subtle inner shadow */
+        }
+        .option-group-title {
+            font-weight: bold;
+            color: #c9d1d9; /* Default title color */
+            width: 100%; /* Ensure title takes full width */
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            border-bottom: 1px solid #4a515c; /* Separator under title */
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        /* Specific layout for Function Type group */
+        .function-type-group {
+            flex-direction: column;
+            align-items: flex-start; /* Align items to the start in column layout */
+            gap: 5px; /* Smaller gap for stacked items */
+        }
+
+        /* Neon Theme Grouping Overrides */
+        body.neon-theme .option-group {
+            border: 1px solid #00ffff66; /* Neon border */
+            background-color: #0d0d1a; /* Darker neon group background */
+            box-shadow: inset 0 0 5px #00ffff11, 0 0 5px #00ffff11;
+        }
+        body.neon-theme .option-group-title {
+            color: #66ff66; /* Neon green title color */
+            text-shadow: 0 0 5px #66ff66;
+            border-bottom: 1px solid #00ffff66; /* Neon separator */
+        }
     </style>
 </head>
-<body>
-    <h1>Throttle Doctor: The Workbench</h1>
+<body class="original-theme"> <!-- Default to original theme -->
+    <h1>Throttle Doctor 💉</h1>
+
+    <div class="theme-toggle">
+        <span>Original Theme</span>
+        <label class="switch">
+            <input type="checkbox" id="theme-toggle-switch"> <!-- Default to unchecked (original) -->
+            <span class="slider"></span>
+        </label>
+        <span>Neon Cyberpunk</span>
+    </div>
 
     <div class="controls">
-        <label>
-            <input type="radio" name="type" value="debounce" checked> Debounce
-        </label>
-        <label>
-            <input type="radio" name="type" value="throttle"> Throttle
-        </label>
-        <label>
-            Wait (ms):
-            <input type="number" id="wait-time" value="300" min="50" step="50">
-        </label>
-        <label>
-            <input type="checkbox" id="leading-edge" checked> Leading Edge
-        </label>
-        <label>
-            <input type="checkbox" id="trailing-edge" checked> Trailing Edge
-        </label>
-        <div class="event-source-group">
-            <label>Event Source:</label>
+        <div class="option-group function-type-group"> <!-- Added function-type-group class -->
+            <span class="option-group-title">Function Type:</span>
+            <label>
+                <input type="radio" name="type" value="debounce" checked> Debounce
+            </label>
+            <label>
+                <input type="radio" name="type" value="throttle"> Throttle
+            </label>
+        </div>
+
+        <div class="option-group">
+            <span class="option-group-title">Timing & Edges:</span>
+            <label>
+                Wait (ms):
+                <input type="number" id="wait-time" value="300" min="50" step="50">
+            </label>
+            <label>
+                <input type="checkbox" id="leading-edge" checked> Leading Edge
+            </label>
+            <label>
+                <input type="checkbox" id="trailing-edge" checked> Trailing Edge
+            </label>
+        </div>
+
+        <div class="option-group">
+            <span class="option-group-title">Event Source:</span>
             <label>
                 <input type="radio" name="event-source" value="mousemove"> Mouse Move
             </label>
@@ -249,21 +494,22 @@
                 <input type="radio" name="event-source" value="both" checked> Both
             </label>
         </div>
+        
         <button onclick="applySettings()">Apply Settings and Reset</button>
     </div>
 
     <div id="event-area">Click or hover rapidly here!</div>
 
-    <div id="output-log">
-        <div class="log-entry">--- Event Log ---</div>
+    <div id="log-section">
+        <div id="output-log">
+            <div class="log-entry">--- Event Log ---</div>
+        </div>
     </div>
 
     <div class="support-blurb">
-        If you find this workbench helpful or appreciate the upcoming `Throttle Doctor` library, consider supporting its development! Your contributions help keep the project healthy and growing.
-        <br><br>
-        You can support me through Ko-fi: <a href="https://ko-fi.com/duroktar" target="_blank">https://ko-fi.com/duroktar</a>
-        <br>
-        Check out the GitHub repository: <a href="https://github.com/Duroktar/ThrottleDoctor" target="_blank">https://github.com/Duroktar/ThrottleDoctor</a>
+        <div>If you find this workbench helpful or appreciate the upcoming `Throttle Doctor` library, consider supporting its development! Your contributions help keep the project healthy and growing.</div>
+        <div>You can support me through Ko-fi: <a href="https://ko-fi.com/duroktar" target="_blank">https://ko-fi.com/duroktar</a></div>
+        <div>Check out the GitHub repository: <a href="https://github.com/Duroktar/ThrottleDoctor" target="_blank">https://github.com/Duroktar/ThrottleDoctor</a></div>
     </div>
 
     <div class="copyright-line">
@@ -401,23 +647,43 @@
         const waitTimeInput = document.getElementById('wait-time');
         const leadingEdgeCheckbox = document.getElementById('leading-edge');
         const trailingEdgeCheckbox = document.getElementById('trailing-edge');
-        const eventSourceRadios = document.querySelectorAll('input[name="event-source"]'); // New: Event source radios
+        const eventSourceRadios = document.querySelectorAll('input[name="event-source"]');
+        const themeToggleSwitch = document.getElementById('theme-toggle-switch');
 
         let eventCount = 0;
         let controlledFunction;
+        let logEntries = []; // Array to store all log entries
 
         function logEvent(type, message) {
-            const entry = document.createElement('div');
-            entry.classList.add('log-entry');
-            entry.textContent = `${new Date().toLocaleTimeString()}.${String(new Date().getMilliseconds()).padStart(3, '0')} - ${message}`;
-            if (type === 'triggered') {
-                entry.classList.add('triggered');
-            } else if (type === 'ignored') {
-                entry.classList.add('ignored');
-            } else if (type === 'info') { /* Added for info messages */
-                entry.classList.add('info');
+            const timestamp = `${new Date().toLocaleTimeString()}.${String(new Date().getMilliseconds()).padStart(3, '0')}`;
+            const entry = { timestamp: new Date(), type: type, message: `${timestamp} - ${message}` }; // Store full timestamp for sorting
+            logEntries.push(entry);
+            renderLog();
+        }
+
+        function renderLog() {
+            // Clear and add the header
+            outputLog.innerHTML = '<div class="log-entry">--- Event Log ---</div>';
+            
+            // Sort logEntries by newest first (descending timestamp)
+            let entriesToRender = [...logEntries].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+            for (const entryData of entriesToRender) {
+                const entryElement = document.createElement('div');
+                entryElement.classList.add('log-entry');
+                entryElement.textContent = entryData.message;
+                if (entryData.type === 'triggered') {
+                    entryElement.classList.add('triggered');
+                } else if (entryData.type === 'ignored') {
+                    entryElement.classList.add('ignored');
+                } else if (entryData.type === 'info') {
+                    entryElement.classList.add('info');
+                }
+                // Append new entries to the log
+                outputLog.appendChild(entryElement);
             }
-            outputLog.prepend(entry); // Add to top
+            // Always scroll to the top to show the newest entries
+            outputLog.scrollTop = 0;
         }
 
         function myEventLogger() {
@@ -427,11 +693,10 @@
         function handleEvent() {
             eventCount++;
             logEvent('ignored', `Event fired. (Total: ${eventCount})`);
-            controlledFunction(); // Call the throttled/debounced function
+            controlledFunction();
         }
 
         function attachEventListeners() {
-            // Remove existing listeners first to prevent duplicates
             eventArea.removeEventListener('mousemove', handleEvent);
             eventArea.removeEventListener('click', handleEvent);
 
@@ -453,9 +718,8 @@
             const leading = leadingEdgeCheckbox.checked;
             const trailing = trailingEdgeCheckbox.checked;
 
-            // Reset event count and log
             eventCount = 0;
-            outputLog.innerHTML = '<div class="log-entry">--- Event Log ---</div>';
+            logEntries = [];
             logEvent('info', `Configured: Type=${selectedType}, Wait=${waitTime}ms, Leading=${leading}, Trailing=${trailing}`);
 
             controlledFunction = throttleDebounce(myEventLogger, waitTime, {
@@ -464,12 +728,35 @@
                 trailing: trailing
             });
 
-            attachEventListeners(); // Re-attach listeners based on new settings
+            attachEventListeners();
+            renderLog();
         }
 
-        function applySettings() {
-            updateControlledFunction();
+        // --- Theme Switching Logic ---
+        function applyTheme(isNeon) {
+            if (isNeon) {
+                document.body.classList.add('neon-theme');
+                localStorage.setItem('theme', 'neon');
+            } else {
+                document.body.classList.remove('neon-theme');
+                localStorage.setItem('theme', 'original');
+            }
         }
+
+        // Load theme preference from localStorage on page load
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'neon') {
+            themeToggleSwitch.checked = true;
+            applyTheme(true);
+        } else {
+            themeToggleSwitch.checked = false;
+            applyTheme(false);
+        }
+
+        // Event listener for theme toggle switch
+        themeToggleSwitch.addEventListener('change', (event) => {
+            applyTheme(event.target.checked);
+        });
 
         // Initial setup
         updateControlledFunction();
@@ -479,7 +766,7 @@
         waitTimeInput.addEventListener('change', updateControlledFunction);
         leadingEdgeCheckbox.addEventListener('change', updateControlledFunction);
         trailingEdgeCheckbox.addEventListener('change', updateControlledFunction);
-        eventSourceRadios.forEach(radio => radio.addEventListener('change', updateControlledFunction)); // New: Event source change listener
+        eventSourceRadios.forEach(radio => radio.addEventListener('change', updateControlledFunction));
     </script>
 </body>
 </html>
