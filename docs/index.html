@@ -3,126 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Throttle/Debounce Higher-Order Function</title>
+    <title>Throttle Doctor: The Workbench</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Orbitron', sans-serif; /* Futuristic heading font */
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #282c34; /* Dark background */
-            color: #abb2bf; /* Light text */
+            min-height: 100vh;
+            background-color: #0a0a1a; /* Very dark, almost black background */
+            color: #00ffff; /* Default neon cyan text */
+            overflow-x: hidden; /* Prevent horizontal scroll on subtle effects */
+            position: relative; /* For background effects */
+        }
+
+        /* Subtle background grid/scanlines effect */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(to right, #00ffff11 1px, transparent 1px),
+                linear-gradient(to bottom, #00ffff11 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+            z-index: -1;
         }
 
         h1 {
-            color: #61afef; /* Light blue heading */
-            margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 2.5em;
+            color: #ff00ff; /* Neon magenta heading */
+            text-shadow: 0 0 8px #ff00ff, 0 0 15px #ff00ff; /* Neon glow */
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            padding-top: 20px;
         }
 
-        .controls {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #323842;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        .controls, .support-blurb, #output-log {
+            background-color: #1a1a2e; /* Darker panel background */
+            border: 1px solid #00ffff; /* Neon cyan border */
+            box-shadow: 0 0 10px #00ffff44, inset 0 0 5px #00ffff22; /* Subtle inner/outer glow */
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            width: 85%; /* Wider panels */
+            max-width: 900px; /* Max width for larger screens */
+            box-sizing: border-box;
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
             align-items: center;
+            position: relative;
+            overflow: hidden; /* For internal glow effects */
         }
 
+        .controls::before, .support-blurb::before, #output-log::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #ff00ff44, inset 0 0 10px #ff00ff22; /* Magenta inner glow */
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+
         .controls label {
+            font-family: 'Share Tech Mono', monospace; /* Monospace for labels */
+            font-size: 1em;
+            color: #00e5ff; /* Lighter neon cyan */
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.95em;
+            gap: 10px;
         }
 
         .controls input[type="radio"],
         .controls input[type="checkbox"] {
-            accent-color: #61afef;
+            accent-color: #ff00ff; /* Neon magenta for checked state */
+            transform: scale(1.2); /* Slightly larger checkboxes/radios */
         }
 
         .controls input[type="number"] {
-            width: 70px;
-            padding: 5px 8px;
-            border: 1px solid #4a515c;
-            background-color: #21252b;
-            color: #abb2bf;
-            border-radius: 4px;
+            width: 80px;
+            padding: 8px 12px;
+            border: 1px solid #00ffff;
+            background-color: #0d0d1a; /* Even darker input background */
+            color: #66ff66; /* Neon green for input values */
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1em;
+            box-shadow: inset 0 0 5px #00ffff33;
         }
 
         button {
-            padding: 12px 25px;
+            font-family: 'Orbitron', sans-serif;
+            padding: 14px 30px;
             font-size: 1.1em;
-            background-color: #61afef;
-            color: white;
+            background: linear-gradient(45deg, #00ffff, #ff00ff); /* Gradient button */
+            color: #0a0a1a; /* Dark text on bright button */
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px #00ffff, 0 0 25px #ff00ff; /* Strong neon glow */
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         button:hover {
-            background-color: #528bff;
-            transform: translateY(-1px);
+            background: linear-gradient(45deg, #ff00ff, #00ffff); /* Reverse gradient on hover */
+            box-shadow: 0 0 20px #ff00ff, 0 0 35px #00ffff;
+            transform: translateY(-2px) scale(1.02);
         }
 
         button:active {
-            transform: translateY(1px);
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 0 5px #00ffff, 0 0 10px #ff00ff;
         }
 
         #event-area {
-            width: 80%;
-            height: 150px;
-            background-color: #0d1117;
-            border: 2px dashed #4a515c;
+            width: 85%;
+            max-width: 900px;
+            height: 180px; /* Slightly taller */
+            background-color: #0d0d1a;
+            border: 2px dashed #ff66cc; /* Neon pink dashed border */
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.2em;
-            color: #98c379;
-            margin-top: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.4em;
+            color: #66ff66; /* Neon green text */
+            margin-top: 25px;
             cursor: pointer;
             user-select: none;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
-            border-radius: 8px;
+            box-shadow: inset 0 0 15px #ff66cc55, 0 0 10px #ff66cc33; /* Inner glow */
+            border-radius: 10px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px #66ff66;
         }
 
         #output-log {
-            width: 80%;
-            height: 250px;
-            background-color: #1a1e24;
-            border: 1px solid #4a515c;
-            margin-top: 20px;
-            padding: 15px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.85em;
-            color: #c9d1d9;
-            border-radius: 8px;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            height: 300px; /* Taller log area */
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9em;
+            color: #00e5ff; /* Log text color */
+            padding: 20px;
+            margin-top: 25px; /* Added padding between event-area and output-log */
         }
         .log-entry {
-            margin-bottom: 5px;
-            line-height: 1.4;
+            margin-bottom: 8px;
+            line-height: 1.5;
+            text-shadow: 0 0 3px #00e5ff22;
         }
         .log-entry.triggered {
-            color: #61afef; /* Blue for triggered events */
+            color: #ff66cc; /* Neon pink for triggered events */
             font-weight: bold;
+            text-shadow: 0 0 5px #ff66cc;
         }
         .log-entry.ignored {
-            color: #7b8493; /* Grey for ignored events */
+            color: #7b8493; /* Subtler grey for ignored events */
+            opacity: 0.7;
+        }
+        .log-entry.info {
+            color: #66ff66; /* Neon green for info messages */
+            font-weight: bold;
+            text-shadow: 0 0 5px #66ff66;
+        }
+
+        .support-blurb {
+            margin-top: 40px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95em;
+            color: #00e5ff;
+            text-shadow: 0 0 5px #00e5ff22;
+        }
+
+        .support-blurb a {
+            color: #ff00ff; /* Neon magenta links */
+            text-decoration: none;
+            font-weight: bold;
+            text-shadow: 0 0 8px #ff00ff;
+            transition: text-shadow 0.3s ease;
+        }
+
+        .support-blurb a:hover {
+            text-decoration: underline;
+            text-shadow: 0 0 12px #ff00ff, 0 0 20px #ff00ff;
+        }
+
+        .copyright-line {
+            margin-top: 25px;
+            font-size: 0.75em;
+            color: #7b8493;
+            text-align: center;
+            width: 80%;
+            font-family: 'Share Tech Mono', monospace;
+            opacity: 0.6;
         }
     </style>
 </head>
 <body>
-    <h1>Throttle/Debounce Function Demonstrator</h1>
+    <h1>Throttle Doctor: The Workbench</h1>
 
     <div class="controls">
         <label>
@@ -141,6 +237,18 @@
         <label>
             <input type="checkbox" id="trailing-edge" checked> Trailing Edge
         </label>
+        <div class="event-source-group">
+            <label>Event Source:</label>
+            <label>
+                <input type="radio" name="event-source" value="mousemove"> Mouse Move
+            </label>
+            <label>
+                <input type="radio" name="event-source" value="click"> Click
+            </label>
+            <label>
+                <input type="radio" name="event-source" value="both" checked> Both
+            </label>
+        </div>
         <button onclick="applySettings()">Apply Settings and Reset</button>
     </div>
 
@@ -148,6 +256,18 @@
 
     <div id="output-log">
         <div class="log-entry">--- Event Log ---</div>
+    </div>
+
+    <div class="support-blurb">
+        If you find this workbench helpful or appreciate the upcoming `Throttle Doctor` library, consider supporting its development! Your contributions help keep the project healthy and growing.
+        <br><br>
+        You can support me through Ko-fi: <a href="https://ko-fi.com/duroktar" target="_blank">https://ko-fi.com/duroktar</a>
+        <br>
+        Check out the GitHub repository: <a href="https://github.com/Duroktar/ThrottleDoctor" target="_blank">https://github.com/Duroktar/ThrottleDoctor</a>
+    </div>
+
+    <div class="copyright-line">
+        &copy; Scott Doucet (@Duroktar) 2025. All rights reserved.
     </div>
 
     <script>
@@ -281,6 +401,7 @@
         const waitTimeInput = document.getElementById('wait-time');
         const leadingEdgeCheckbox = document.getElementById('leading-edge');
         const trailingEdgeCheckbox = document.getElementById('trailing-edge');
+        const eventSourceRadios = document.querySelectorAll('input[name="event-source"]'); // New: Event source radios
 
         let eventCount = 0;
         let controlledFunction;
@@ -293,6 +414,8 @@
                 entry.classList.add('triggered');
             } else if (type === 'ignored') {
                 entry.classList.add('ignored');
+            } else if (type === 'info') { /* Added for info messages */
+                entry.classList.add('info');
             }
             outputLog.prepend(entry); // Add to top
         }
@@ -300,6 +423,29 @@
         function myEventLogger() {
             logEvent('triggered', `Function executed! (Event count: ${eventCount})`);
         }
+
+        function handleEvent() {
+            eventCount++;
+            logEvent('ignored', `Event fired. (Total: ${eventCount})`);
+            controlledFunction(); // Call the throttled/debounced function
+        }
+
+        function attachEventListeners() {
+            // Remove existing listeners first to prevent duplicates
+            eventArea.removeEventListener('mousemove', handleEvent);
+            eventArea.removeEventListener('click', handleEvent);
+
+            const selectedSource = document.querySelector('input[name="event-source"]:checked').value;
+
+            if (selectedSource === 'mousemove' || selectedSource === 'both') {
+                eventArea.addEventListener('mousemove', handleEvent);
+            }
+            if (selectedSource === 'click' || selectedSource === 'both') {
+                eventArea.addEventListener('click', handleEvent);
+            }
+            logEvent('info', `Event source set to: ${selectedSource}`);
+        }
+
 
         function updateControlledFunction() {
             const selectedType = document.querySelector('input[name="type"]:checked').value;
@@ -317,29 +463,23 @@
                 leading: leading,
                 trailing: trailing
             });
+
+            attachEventListeners(); // Re-attach listeners based on new settings
         }
 
-        function handleEvent() {
-            eventCount++;
-            logEvent('ignored', `Event fired. (Total: ${eventCount})`);
-            controlledFunction(); // Call the throttled/debounced function
+        function applySettings() {
+            updateControlledFunction();
         }
 
         // Initial setup
         updateControlledFunction();
 
-        // Attach event listeners
-        eventArea.addEventListener('mousemove', handleEvent); // For rapid events
-        eventArea.addEventListener('click', handleEvent);     // Also for clicks
-
+        // Attach change listeners for controls
         typeRadios.forEach(radio => radio.addEventListener('change', updateControlledFunction));
         waitTimeInput.addEventListener('change', updateControlledFunction);
         leadingEdgeCheckbox.addEventListener('change', updateControlledFunction);
         trailingEdgeCheckbox.addEventListener('change', updateControlledFunction);
-
-        function applySettings() {
-            updateControlledFunction();
-        }
+        eventSourceRadios.forEach(radio => radio.addEventListener('change', updateControlledFunction)); // New: Event source change listener
     </script>
 </body>
 </html>
