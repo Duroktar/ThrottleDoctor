@@ -4,6 +4,8 @@
   <img src="https://raw.githubusercontent.com/Duroktar/ThrottleDoctor/refs/heads/main/public/logo.svg" width="800px" />
 </p>
 
+[Start here](https://duroktar.github.io/ThrottleDoctor/)
+
 ## 🩺 Fine-Tune Your Event Handling!
 
 Welcome to the `Throttle Doctor` Workbench! This interactive demonstration site is your personal sandbox for understanding and experimenting with the core concepts of throttling and debouncing in JavaScript.
@@ -22,7 +24,15 @@ Are you tired of guessing how `leading` vs. `trailing` edge executions behave? D
 
 ## 🚀 How to Use
 
+### Run locally
+
 Simply open `index.html` in your web browser. Use the controls at the top to configure your desired throttling or debouncing behavior, then interact with the designated "Event Area" to see the results reflected in the "Output Log."
+
+### Use online
+
+### Online (recommended)
+ 
+[Start here](https://duroktar.github.io/ThrottleDoctor/)
 
 ## 💡 Why This Workbench?
 
