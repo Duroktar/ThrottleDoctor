@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Throttle Doctor</title>
-    <!-- Google tag (gtag.js) -->
+    <!-- Google Analytics (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QDX3CMJMMQ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -13,6 +13,7 @@
 
       gtag('config', 'G-QDX3CMJMMQ');
     </script>
+    <!-- End Google Analytics -->
     <style>
         /* Import fonts for both themes */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
@@ -32,6 +33,7 @@
             overflow-x: hidden;
             position: relative;
             gap: 25px; /* Unified vertical spacing between direct children */
+            padding-bottom: 1em; /* Added space at the bottom */
         }
 
         body::before { /* Remove grid for original theme */
@@ -218,10 +220,19 @@
             margin-top: 0; /* Managed by body gap */
             font-size: 0.75em;
             color: #7b8493;
-            text-align: center;
             width: 80%;
             font-family: Arial, sans-serif;
             opacity: 1;
+            display: flex; /* Use flexbox */
+            justify-content: space-between; /* Space items out */
+            align-items: center; /* Vertically align items */
+            padding: 0 10px; /* Add some padding on the sides */
+        }
+
+        .copyright-line .version-text {
+            font-size: 0.9em; /* Slightly larger for visibility */
+            color: #abb2bf; /* Match main text color */
+            font-weight: bold;
         }
 
         /* Theme Toggle Switch Styles */
@@ -408,6 +419,9 @@
             font-family: 'Share Tech Mono', monospace;
             opacity: 0.6;
         }
+        body.neon-theme .copyright-line .version-text {
+            color: #00ffff; /* Neon cyan for version text */
+        }
 
         /* New Grouping Styles */
         .option-group {
@@ -504,7 +518,7 @@
             </label>
         </div>
         
-        <button onclick="applySettings()">Apply Settings and Reset</button>
+        <button onclick="applySettings()">Reset Event Log</button>
     </div>
 
     <div id="event-area">Click or hover rapidly here!</div>
@@ -522,7 +536,8 @@
     </div>
 
     <div class="copyright-line">
-        &copy; Scott Doucet (@Duroktar) 2025. All rights reserved.
+        <span>&copy; Scott Doucet (@Duroktar) 2025. All rights reserved.</span>
+        <span class="version-text">v1.0.1</span>
     </div>
 
     <script>
@@ -663,6 +678,11 @@
         let controlledFunction;
         let logEntries = []; // Array to store all log entries
 
+        /**
+         * Logs an event to the output log.
+         * @param {string} type - The type of log entry ('triggered', 'ignored', 'info').
+         * @param {string} message - The message to display.
+         */
         function logEvent(type, message) {
             const timestamp = `${new Date().toLocaleTimeString()}.${String(new Date().getMilliseconds()).padStart(3, '0')}`;
             const entry = { timestamp: new Date(), type: type, message: `${timestamp} - ${message}` }; // Store full timestamp for sorting
@@ -670,6 +690,9 @@
             renderLog();
         }
 
+        /**
+         * Renders the log entries to the output log, sorting by newest first.
+         */
         function renderLog() {
             // Clear and add the header
             outputLog.innerHTML = '<div class="log-entry">--- Event Log ---</div>';
@@ -695,16 +718,25 @@
             outputLog.scrollTop = 0;
         }
 
+        /**
+         * The function that gets debounced/throttled and logs its execution.
+         */
         function myEventLogger() {
             logEvent('triggered', `Function executed! (Event count: ${eventCount})`);
         }
 
+        /**
+         * Handles the raw event from the event area.
+         */
         function handleEvent() {
             eventCount++;
             logEvent('ignored', `Event fired. (Total: ${eventCount})`);
             controlledFunction();
         }
 
+        /**
+         * Attaches event listeners based on selected event source.
+         */
         function attachEventListeners() {
             eventArea.removeEventListener('mousemove', handleEvent);
             eventArea.removeEventListener('click', handleEvent);
@@ -718,9 +750,34 @@
                 eventArea.addEventListener('click', handleEvent);
             }
             logEvent('info', `Event source set to: ${selectedSource}`);
+            updateEventAreaText(selectedSource); // Update text when listeners are attached
+        }
+
+        /**
+         * Updates the text content of the event area based on the selected event source.
+         * @param {string} selectedSource - The value of the selected event source radio button.
+         */
+        function updateEventAreaText(selectedSource) {
+            switch (selectedSource) {
+                case 'mousemove':
+                    eventArea.textContent = "Hover here!";
+                    break;
+                case 'click':
+                    eventArea.textContent = "Click rapidly here!";
+                    break;
+                case 'both':
+                    eventArea.textContent = "Click or hover here!";
+                    break;
+                default:
+                    eventArea.textContent = "Interact here!";
+            }
         }
 
 
+        /**
+         * Updates the controlled (debounced/throttled) function based on current settings.
+         * Resets event count and log.
+         */
         function updateControlledFunction() {
             const selectedType = document.querySelector('input[name="type"]:checked').value;
             const waitTime = parseInt(waitTimeInput.value, 10);
@@ -728,7 +785,7 @@
             const trailing = trailingEdgeCheckbox.checked;
 
             eventCount = 0;
-            logEntries = [];
+            logEntries = []; // Clear log entries
             logEvent('info', `Configured: Type=${selectedType}, Wait=${waitTime}ms, Leading=${leading}, Trailing=${trailing}`);
 
             controlledFunction = throttleDebounce(myEventLogger, waitTime, {
@@ -741,7 +798,18 @@
             renderLog();
         }
 
+        /**
+         * Function called by the "Apply Settings and Reset" button.
+         */
+        function applySettings() {
+            updateControlledFunction();
+        }
+
         // --- Theme Switching Logic ---
+        /**
+         * Applies the selected theme to the body and saves preference to local storage.
+         * @param {boolean} isNeon - True to apply neon theme, false for original.
+         */
         function applyTheme(isNeon) {
             if (isNeon) {
                 document.body.classList.add('neon-theme');
